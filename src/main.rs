@@ -1,18 +1,22 @@
-#![no_std]
+#![deny(unsafe_code)]
 #![no_main]
-
-use panic_rtt_target as _;
-use rtt_target::{rtt_init_print, rprintln};
+#![no_std]
 
 use cortex_m_rt::entry;
+use panic_halt as _;
+use microbit as _;
+use cortex_m_semihosting::hprintln;
 
 #[entry]
 fn main() -> ! {
-    rtt_init_print!();
-    rprintln!("Hello World");
-    let mut count = 0;
+    let _y;
+    let x = 42;
+    _y = x;
+
+    // infinite loop; just so we don't leave this stack frame
+    let mut i = 0;
     loop {
-        rprintln!("loop {}", count);
-        count += 1;
+        hprintln!("cycle {}", i);
+        i += 1;
     }
 }
