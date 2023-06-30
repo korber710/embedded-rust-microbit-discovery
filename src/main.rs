@@ -12,7 +12,14 @@ use microbit::{
 };
 use cortex_m_semihosting::hprintln;
 
-fn increment_row(row: &mut usize, col: usize, direction: bool, display: &mut Display, timer: &mut Timer<TIMER0>) {
+fn increment_led(
+    row: &mut usize,
+    col: &mut usize,
+    use_row: bool,
+    increase: bool,
+    display: &mut Display,
+    timer: &mut Timer<TIMER0>)
+{
     let empty: [[u8; 5]; 5] = [
         [0, 0, 0, 0, 0,],
         [0, 0, 0, 0, 0,],
@@ -20,41 +27,25 @@ fn increment_row(row: &mut usize, col: usize, direction: bool, display: &mut Dis
         [0, 0, 0, 0, 0,],
         [0, 0, 0, 0, 0,],
     ];
-    if *row < 5 {
+    if *row < 5 && *col < 5 {
         for _ in 0..4 {
             let mut array = empty.clone();
-            array[*row][col] = 1;
-            display.show(timer, array, 100u32);
+            array[*row][*col] = 1;
+            display.show(timer, array, 30u32);
             // display.clear();
             drop(array);
-            if direction {
-                *row += 1;
+            if increase {
+                if use_row {
+                    *row += 1;
+                } else {
+                    *col += 1;
+                }
             } else {
-                *row -= 1;
-            }
-        }
-    }
-}
-
-fn increment_col(row: usize, col: &mut usize, direction: bool, display: &mut Display, timer: &mut Timer<TIMER0>) {
-    let empty: [[u8; 5]; 5] = [
-        [0, 0, 0, 0, 0,],
-        [0, 0, 0, 0, 0,],
-        [0, 0, 0, 0, 0,],
-        [0, 0, 0, 0, 0,],
-        [0, 0, 0, 0, 0,],
-    ];
-    if *col < 5 {
-        for _ in 0..4 {
-            let mut array = empty.clone();
-            array[row][*col] = 1;
-            display.show(timer, array, 100u32);
-            // display.clear();
-            drop(array);
-            if direction {
-                *col += 1;
-            } else {
-                *col -= 1;
+                if use_row {
+                    *row -= 1;
+                } else {
+                    *col -= 1;
+                }
             }
         }
     }
@@ -73,10 +64,14 @@ fn main() -> ! {
     let mut row = 0;
     loop {
         // hprintln!("cycle {}", i);
-        increment_row(&mut row, col, true, &mut display, &mut timer);
-        increment_col(row, &mut col, true, &mut display, &mut timer);
-        increment_row(&mut row, col, false, &mut display, &mut timer);
-        increment_col(row, &mut col, false, &mut display, &mut timer);
+        let increment_upwards = true;
+        let increment_downwards = false;
+        let update_row = true;
+        let update_col = false;
+        increment_led(&mut row, &mut col, update_row, increment_upwards, &mut display, &mut timer);
+        increment_led(&mut row, &mut col, update_col, increment_upwards, &mut display, &mut timer);
+        increment_led(&mut row, &mut col, update_row, increment_downwards, &mut display, &mut timer);
+        increment_led(&mut row, &mut col, update_col, increment_downwards, &mut display, &mut timer);
         i += 1;
     }
 }
