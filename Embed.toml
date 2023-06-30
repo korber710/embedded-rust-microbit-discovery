@@ -4,8 +4,11 @@ protocol = "Swd"
 [default.general]
 chip = "nrf52833_xxAA"
 
+[default.reset]
+halt_afterwards = false
+
 [default.rtt]
-enabled = true
+enabled = false
 
 [default.gdb]
 enabled = false
